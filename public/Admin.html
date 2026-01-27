@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | JWT Challenge</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container {
+            border: 2px solid var(--accent);
+            background: linear-gradient(145deg,
+                    rgba(255, 111, 145, 0.18),
+                    rgba(20, 20, 35, 0.75));
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow:
+                0 0 25px rgba(255, 111, 145, 0.35),
+                inset 0 0 20px rgba(255, 111, 145, 0.12);
+        }
+
+        /* FLAG */
+        .flag-display {
+            font-family: 'Courier New', Courier, monospace;
+            background: radial-gradient(circle at top,
+                    rgba(16, 185, 129, 0.15),
+                    rgba(17, 24, 39, 0.95));
+            color: #34d399;
+            padding: 2rem;
+            border-radius: 0.85rem;
+            margin-top: 2rem;
+            word-break: break-all;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(52, 211, 153, 0.35);
+            box-shadow:
+                inset 0 0 15px rgba(52, 211, 153, 0.2),
+                0 10px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Hacker watermark */
+        .flag-display::before {
+            content: "ADMIN_ACCESS_GRANTED";
+            position: absolute;
+            top: 0.6rem;
+            right: 0.75rem;
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            opacity: 0.45;
+            color: #6ee7b7;
+        }
+
+        /* Glitch scanline effect */
+        .flag-display::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(to bottom,
+                    transparent 0px,
+                    transparent 2px,
+                    rgba(255, 255, 255, 0.04) 3px);
+            pointer-events: none;
+        }
+
+        /* Optional pulse when flag appears */
+        .flag-display {
+            animation: flagGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes flagGlow {
+            from {
+                box-shadow:
+                    inset 0 0 12px rgba(52, 211, 153, 0.25),
+                    0 0 20px rgba(52, 211, 153, 0.35);
+            }
+
+            to {
+                box-shadow:
+                    inset 0 0 20px rgba(52, 211, 153, 0.4),
+                    0 0 35px rgba(52, 211, 153, 0.55);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container admin-container">
+        <h1>Admin Panel</h1>
+        <p>Sensitive area — Authorized personnel only</p>
+
+        <div id="loading">Verifying credentials...</div>
+
+        <div id="adminContent" style="display: none;">
+            <div class="form-group">
+                <label>System Status</label>
+                <div style="color: #10b981; font-weight: 600;">● Admin Access Granted</div>
+            </div>
+
+            <div class="flag-display" id="flagBox">
+                <!-- Flag will appear here -->
+            </div>
+
+            <div class="footer-link" style="margin-top: 2rem;">
+                <a href="/profile">Back to Profile</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchAdminData() {
+            try {
+                const res = await fetch('/api/profile');
+                if (res.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const data = await res.json();
+
+                if (data.role !== 'admin') {
+                    document.body.innerHTML = `
+                        <div class="container">
+                            <h1 style="color: #ef4444;">Access Denied</h1>
+                            <p>You do not have administrative privileges.</p>
+                            <a href="/profile" style="color: #4f46e5; text-decoration: none;">Return to Profile</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                document.getElementById('flagBox').innerHTML = `
+                    <div style="font-size: 0.8rem; margin-bottom: 0.5rem; opacity: 0.7;">System Flag:</div>
+                    <div style="font-size: 1.25rem; font-weight: bold;">${data.flag}</div>
+                `;
+
+            } catch (err) {
+                document.getElementById('loading').textContent = 'Error verifying session.';
+            }
+        }
+
+        fetchAdminData();
+    </script>
+</body>
+
+</html>

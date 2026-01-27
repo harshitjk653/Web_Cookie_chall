@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | JWT Challenge</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>User Profile</h1>
+        <p>Your account information</p>
+
+        <div id="loading">Loading profile...</div>
+
+        <div id="profileInfo" style="display: none;">
+            <div class="form-group">
+                <label>Username</label>
+                <div id="dispUsername" style="font-weight: 600; padding: 0.5rem 0;"></div>
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <div id="dispRole" style="font-weight: 600; padding: 0.5rem 0; color: #4f46e5;"></div>
+            </div>
+
+            <div id="adminContent"></div>
+        </div>
+
+        <div class="footer-link">
+            <a href="#" id="logoutBtn">Log out</a>
+        </div>
+    </div>
+
+    <script>
+        const loading = document.getElementById('loading');
+        const profileInfo = document.getElementById('profileInfo');
+        const dispUsername = document.getElementById('dispUsername');
+        const dispRole = document.getElementById('dispRole');
+        const adminContent = document.getElementById('adminContent');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        async function fetchProfile() {
+            try {
+                const res = await fetch('/api/profile');
+                if (res.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const data = await res.json();
+
+                loading.style.display = 'none';
+                profileInfo.style.display = 'block';
+
+                dispUsername.textContent = data.username;
+                dispRole.textContent = data.role.toUpperCase();
+
+                if (data.role === 'admin') {
+                    setTimeout(() => window.location.href = '/Admin', 1000)
+                }
+            } catch (err) {
+                loading.textContent = 'Error loading profile.';
+            }
+        }
+
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Delete cookie
+            document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.location.href = '/login';
+        });
+
+        fetchProfile();
+    </script>
+</body>
+
+</html>
