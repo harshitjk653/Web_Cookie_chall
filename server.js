@@ -53,7 +53,7 @@ app.get('/api/profile', (req, res) => {
             return res.json({
                 username,
                 role,
-                flag: process.env.FLAG || 'FLAG{jwt_role_escalation_success}'
+                flag: process.env.FLAG || 'AKIRA{jwt_role_escalation_success}'
             });
         }
 
