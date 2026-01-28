@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # Node.js Application
+  app:
+    build: .
+    container_name: jwt-ctf-app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongo:27017/jwt_ctf
+      - JWT_SECRET=secret123
+      - FLAG=AKIRA{jwt_role_escalation_success}
+      - PORT=3000
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    networks:
+      - ctf-network
+
+  # MongoDB Database
+  mongo:
+    image: mongo:7.0
+    container_name: jwt-ctf-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+    networks:
+      - ctf-network
+
+volumes:
+  mongo-data:
+    driver: local
+
+networks:
+  ctf-network:
+    driver: bridge
