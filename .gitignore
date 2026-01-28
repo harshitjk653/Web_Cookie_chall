@@ -1,4 +1,6 @@
-node_modules
+node_modules/
 package-lock.json
 .env
 package.json
+.DS_Store
+.vercel
