@@ -10,14 +10,26 @@ services:
     environment:
       - NODE_ENV=production
       - MONGODB_URI=mongodb://mongo:27017/jwt_ctf
-      - JWT_SECRET=secret123
-      - FLAG=AKIRA{jwt_role_escalation_success}
+      - JWT_SECRET=${JWT_SECRET:-secret123}
+      - FLAG=${FLAG:-AKIRA{jwt_role_escalation_success}}
       - PORT=3000
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - ctf-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # MongoDB Database
   mongo:
@@ -30,6 +42,17 @@ services:
     restart: unless-stopped
     networks:
       - ctf-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   mongo-data:
