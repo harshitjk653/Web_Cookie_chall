@@ -1,7 +1,6 @@
 # Dependencies
 node_modules/
 npm-debug.log*
-package-lock.json
 
 # Environment variables
 .env
@@ -16,3 +15,17 @@ Thumbs.db
 
 # Docker
 .dockerignore
+Dockerfile
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Test files
+test/
+*.test.js
+
