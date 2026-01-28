@@ -1,8 +1,0 @@
-node_modules/
-.env
-.DS_Store
-.vercel
-.elasticbeanstalk/
-.git/
-*.log
-npm-debug.log*
