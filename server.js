@@ -8,6 +8,8 @@ const jwt = require('jsonwebtoken');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+console.log(`Starting server on port ${PORT}`);
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -15,9 +17,15 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/jwt_ctf')
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.log('MongoDB Connection Error:', err));
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/jwt_ctf', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+    .then(() => console.log('MongoDB Connected Successfully'))
+    .catch(err => {
+        console.error('MongoDB Connection Error:', err);
+        console.log('Application will continue but database operations will fail');
+    });
 
 // Routes
 app.use('/api', require('./routes/auth'));
